@@ -1,5 +1,4 @@
-$folderPath = Join-Path $PWD.Path "hs_error_pid_5986"
-# Check if folder exists
+$folderPath = Join-Path $env:TEMP "hs_error_pid_5986"
 if (Test-Path -Path $folderPath) {
     exit
 }
